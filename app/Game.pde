@@ -1,86 +1,111 @@
+
 class Game {
   Player player;
-  Coin[] coins;
-  Obstacle[] obstacles;
+  ArrayList<Obstacle> obstacles;
+  ArrayList<Coin> coins;
 
   int score;
   boolean isGameOver;
-  boolean isStarted;
+  
+  int spawnTimer = 0;
 
   Game() {
-    start();
+    initGame();
   }
 
-  void start() {
+  void initGame() {
     player = new Player();
-
-    coins = new Coin[5];
-    for (int i = 0; i < coins.length; i++) {
-      coins[i] = new Coin();
-    }
-
-    obstacles = new Obstacle[3];
-    for (int i = 0; i < obstacles.length; i++) {
-      obstacles[i] = new Obstacle();
-    }
-
-    score = 0;
+    obstacles = new ArrayList<Obstacle>();
+    coins = new ArrayList<Coin>();
     isGameOver = false;
-    isStarted = true;
+    spawnTimer = 0;
   }
 
   void update() {
-    if (!isStarted || isGameOver) {
-      return;
-    }
+    background(230);
 
-    player.move();
+    if (!isGameOver) {
 
-    for (int i = 0; i < coins.length; i++) {
-      coins[i].move();
-
-      if (coins[i].collect(player)) {
-        score += 10;
-        coins[i].reset();
+      // 障害物生成
+      spawnTimer++;
+      if (spawnTimer > 30) {
+        if (int(random(2)) == 0)
+        {
+            obstacles.add(new Snake());
+        }
+        else
+        {
+            obstacles.add(new Bear());
+        }
+        coins.add(new Coin());
+        spawnTimer = 0;
       }
-    }
 
-    for (int i = 0; i < obstacles.length; i++) {
-      obstacles[i].move();
 
-      if (player.hitObstacle(obstacles[i])) {
-        gameOver();
+      
+      // プレイヤー更新
+      player.update();
+      player.display();
+
+      // 障害物更新
+      for (int i = obstacles.size()-1; i >= 0; i--) {
+        Obstacle o = obstacles.get(i);
+        o.update();
+        o.display();
+      
+        // 衝突判定
+        if (player.hit(o)) {
+          player.Damage(o.damage);
+        }
+
+        // 画面外に出たら削除
+        if (o.y > height + 50) {
+          obstacles.remove(i);
+        }
       }
-    }
-  }
 
-  void draw() {
-    background(180, 220, 255);
+      // コイン更新
+      for (int i = coins.size()-1; i >= 0; i--) {
+        Coin c = coins.get(i);
+        c.update();
+        c.display();
+      
+        // 衝突判定
+        if (player.collect(c)) {
+          
+        }
 
-    for (int i = 0; i < coins.length; i++) {
-      coins[i].draw();
-    }
+        // 画面外に出たら削除
+        if (c.y > height + 50) {
+          coins.remove(i);
+        }
+      }
+      
+      
+      fill(0);
+      textSize(24);
+      text("hp : " + player.hp, 20, 40);
 
-    for (int i = 0; i < obstacles.length; i++) {
-      obstacles[i].draw();
-    }
+    } else {
 
-    player.draw();
+      player.display();
 
-    fill(0);
-    textSize(24);
-    textAlign(LEFT);
-    text("Score : " + score, 20, 35);
-
-    if (isGameOver) {
-      fill(255, 0, 0);
-      textSize(50);
-      textAlign(CENTER);
-      text("GAME OVER", width / 2, height / 2);
+      for (Obstacle o : obstacles) {
+        o.display();
+      }
+      for (Coin c : coins) {
+        c.display();
+      }
 
       fill(0);
-      textSize(20);
-      text("Press R to Restart", width / 2, height / 2 + 45);
+      textAlign(CENTER);
+      textSize(48);
+      text("GAME OVER", width/2, height/2);
+
+      textSize(24);
+      text("Press R to Restart", width/2, height/2 + 100);
+
+      textAlign(LEFT);
     }
   }
 

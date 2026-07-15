@@ -40,6 +40,12 @@ class Player {
     return d < r + o.size/2;
   }
   
+  boolean collect(Coin c) {
+    float d = dist(x, y, c.x, c.y);
+
+    return d < r + c.size/2;
+  }
+  
   void Damage(int damage)
   {
     hp -= damage;
