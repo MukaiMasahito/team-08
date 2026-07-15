@@ -8,7 +8,7 @@ class Player {
 
   Player() {
     x = width/2;
-    y = height - 80;
+    y = height - 150;
     hp = 100;
   }
 
@@ -49,5 +49,9 @@ class Player {
   void Damage(int damage)
   {
     hp -= damage;
+
+  if (hp < 0) {
+    hp = 0;
+  }
   }
 }

@@ -2,7 +2,7 @@ class Bear extends Obstacle{
   
   Bear()
   {
-    damage = 1000;
+    damage = 20;
   }
   
 
@@ -106,5 +106,4 @@ void display() {
 
   noStroke();
 }
->>>>>>> 0c1c2fb (プレイヤーをクマの見た目に変更)
 }

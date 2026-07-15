@@ -48,21 +48,32 @@ class Game {
       player.display();
 
       // 障害物更新
-      for (int i = obstacles.size()-1; i >= 0; i--) {
-        Obstacle o = obstacles.get(i);
-        o.update();
-        o.display();
-      
-        // 衝突判定
-        if (player.hit(o)) {
-          player.Damage(o.damage);
-        }
+for (int i = obstacles.size()-1; i >= 0; i--) {
+  Obstacle o = obstacles.get(i);
 
-        // 画面外に出たら削除
-        if (o.y > height + 50) {
-          obstacles.remove(i);
-        }
-      }
+  o.update();
+  o.display();
+
+  // 衝突判定
+  if (player.hit(o)) {
+    player.Damage(o.damage);
+
+    // 当たった障害物を削除
+    obstacles.remove(i);
+
+    // HPが0になったらゲームオーバー
+    if (player.hp <= 0) {
+      gameOver();
+    }
+
+    continue;
+  }
+
+  // 画面外に出たら削除
+  if (o.y > height + 50) {
+    obstacles.remove(i);
+  }
+}
 
       // コイン更新
       for (int i = coins.size()-1; i >= 0; i--) {
@@ -80,7 +91,7 @@ class Game {
           coins.remove(i);
         }
       }
-      
+
       
       fill(0);
       textSize(24);
@@ -89,6 +100,7 @@ class Game {
     } else {
 
       player.display();
+ 
 
       for (Obstacle o : obstacles) {
         o.display();
