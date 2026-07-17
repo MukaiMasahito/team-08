@@ -8,9 +8,23 @@ void setup() {
 void draw() {
   game.update();
 }
-
 void keyPressed() {
-  if (key == CODED) {
+
+  // タイトル画面中
+  if (!game.isStarted) {
+    if (key == ' ') {
+      game.isStarted = true;
+
+      // 開始時にキーの状態を初期化
+      game.player.movingLeft = false;
+      game.player.movingRight = false;
+    }
+
+    return;
+  }
+
+  // ゲーム中の左右移動
+  if (!game.isGameOver) {
     if (keyCode == LEFT) {
       game.player.movingLeft = true;
     }
@@ -20,19 +34,19 @@ void keyPressed() {
     }
   }
 
-  if (key == 'r' || key == 'R') {
+  // ゲームオーバー後にRでタイトルへ戻る
+  if (game.isGameOver && (key == 'r' || key == 'R')) {
     game.initGame();
   }
 }
 
 void keyReleased() {
-  if (key == CODED) {
-    if (keyCode == LEFT) {
-      game.player.movingLeft = false;
-    }
 
-    if (keyCode == RIGHT) {
-      game.player.movingRight = false;
-    }
+  if (keyCode == LEFT) {
+    game.player.movingLeft = false;
+  }
+
+  if (keyCode == RIGHT) {
+    game.player.movingRight = false;
   }
 }

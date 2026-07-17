@@ -5,10 +5,12 @@ class Game {
 
   int score;
   boolean isGameOver;
+  boolean isStarted;
   
   int spawnTimer = 0;
   
   float roadLineOffset = 0;
+  float treeOffset = 0;
   int coinEffectTimer = 0;
   float effectX;
   float effectY;
@@ -19,16 +21,25 @@ class Game {
   }
 
   void initGame() {
-    player = new Player();
-    obstacles = new ArrayList<Obstacle>();
-    coins = new ArrayList<Coin>();
-    isGameOver = false;
-    spawnTimer = 0;
-  }
+  player = new Player();
+  obstacles = new ArrayList<Obstacle>();
+  coins = new ArrayList<Coin>();
+
+  score = 0;
+  spawnTimer = 0;
+  coinEffectTimer = 0;
+
+  isGameOver = false;
+  isStarted = false;
+}
 
   void update() {
     drawRoad();
 
+   if (!isStarted) {
+    drawTitleScreen();
+    return;
+  }
     if (!isGameOver) {
 
       // 障害物生成
@@ -102,7 +113,6 @@ for (int i = obstacles.size()-1; i >= 0; i--) {
   continue;
 }
         
-
           // 画面外に出たら削除
         if (c.y > height + 50) {
           coins.remove(i);
@@ -145,7 +155,7 @@ drawCoinEffect();
     isGameOver = true;
   }
 
-  void drawRoad() {
+ void drawRoad() {
   background(120, 190, 100);
 
   noStroke();
@@ -159,6 +169,43 @@ drawCoinEffect();
     0, height
   );
 
+  // 道路脇の木を動かす
+  treeOffset += 10;
+
+  if (treeOffset > 130) {
+    treeOffset = 0;
+  }
+
+  for (float treeY = -130 + treeOffset;
+       treeY < height + 130;
+       treeY += 130) {
+
+    float roadHalfWidth = map(
+      treeY,
+      0,
+      height,
+      60,
+      width / 2
+    );
+
+    float treeSize = map(
+      treeY,
+      0,
+      height,
+      12,
+      75
+    );
+
+    float leftTreeX =
+      width / 2 - roadHalfWidth - treeSize * 0.45;
+
+    float rightTreeX =
+      width / 2 + roadHalfWidth + treeSize * 0.45;
+
+    drawTree(leftTreeX, treeY, treeSize);
+    drawTree(rightTreeX, treeY, treeSize);
+  }
+
   // 中央線を動かす
   roadLineOffset += 12;
 
@@ -169,9 +216,10 @@ drawCoinEffect();
   fill(255, 240, 120);
   rectMode(CENTER);
 
-  for (float y = -120 + roadLineOffset; y < height; y += 120) {
+  for (float y = -120 + roadLineOffset;
+       y < height;
+       y += 120) {
 
-    // 奥では細く、手前では太くする
     float lineWidth = map(y, 0, height, 4, 18);
     float lineHeight = map(y, 0, height, 20, 90);
 
@@ -217,5 +265,71 @@ void drawCoinEffect() {
     noStroke();
     textAlign(LEFT);
   }
+}
+  void drawTree(float x, float y, float treeSize) {
+
+  noStroke();
+
+  // 幹
+  fill(110, 70, 35);
+  rectMode(CENTER);
+  rect(x, y + treeSize * 0.2,
+       treeSize * 0.2,
+       treeSize * 0.6);
+
+  // 葉
+  fill(40, 150, 60);
+  ellipse(x, y, treeSize, treeSize);
+
+  fill(60, 180, 80);
+  ellipse(x - treeSize * 0.2,
+          y - treeSize * 0.2,
+          treeSize * 0.7,
+          treeSize * 0.7);
+
+  ellipse(x + treeSize * 0.2,
+          y - treeSize * 0.2,
+          treeSize * 0.7,
+          treeSize * 0.7);
+}
+
+void drawTitleScreen() {
+
+  PFont font = createFont("MS Gothic", 32);
+  textFont(font);
+
+  fill(0, 150);
+  rectMode(CORNER);
+  rect(0, 0, width, height);
+
+  textAlign(CENTER);
+
+  fill(255, 220, 0);
+  textSize(52);
+  text("FOREST RUN", width / 2, 220);
+
+  fill(255);
+  textSize(22);
+  text("クマやヘビをよけてコインを集めよう！",
+       width / 2, 280);
+
+  textSize(20);
+  text("← → キー：左右移動",
+       width / 2, 380);
+
+  text("コインを取るとスコアアップ",
+       width / 2, 420);
+
+  text("障害物に当たるとHPが減る",
+       width / 2, 460);
+
+  if ((frameCount / 30) % 2 == 0) {
+    fill(255, 240, 100);
+    textSize(30);
+    text("SPACEキーでスタート",
+         width / 2, 600);
+  }
+
+  textAlign(LEFT);
 }
 }
