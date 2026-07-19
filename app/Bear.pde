@@ -2,7 +2,7 @@ class Bear extends Obstacle{
   
   Bear()
   {
-    damage = 20;
+    damage = 40;
   }
   
 

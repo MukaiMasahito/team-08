@@ -2,8 +2,13 @@ class Game {
   Player player;
   ArrayList<Obstacle> obstacles;
   ArrayList<Coin> coins;
+  
+  // dataフォルダ内の画像を読み込みます（ファイル名は保存名に合わせてください）
+  PImage snakeImage = loadImage("snake.png"); 
 
   int score;
+  float highSpeed;
+  float maxHighSpeed;
   boolean isGameOver;
   boolean isStarted;
   
@@ -26,6 +31,8 @@ class Game {
   coins = new ArrayList<Coin>();
 
   score = 0;
+  highSpeed = 1;
+  maxHighSpeed = 1;
   spawnTimer = 0;
   coinEffectTimer = 0;
 
@@ -34,7 +41,7 @@ class Game {
 }
 
   void update() {
-    drawRoad();
+    drawRoad(highSpeed);
 
    if (!isStarted) {
     drawTitleScreen();
@@ -47,7 +54,8 @@ class Game {
       if (spawnTimer > 30) {
         if (int(random(2)) == 0)
         {
-            obstacles.add(new Snake());
+            obstacles.add(new Snake(snakeImage));
+            obstacles.add(new Snake(snakeImage));
         }
         else
         {
@@ -60,19 +68,26 @@ class Game {
 
       
       // プレイヤー更新
-      player.update();
+      player.update(highSpeed);
       player.display();
 
       // 障害物更新
 for (int i = obstacles.size()-1; i >= 0; i--) {
   Obstacle o = obstacles.get(i);
 
-  o.update();
+  o.update(highSpeed);
   o.display();
 
   // 衝突判定
   if (player.hit(o)) {
     player.Damage(o.damage);
+    
+    //スピードダウン
+    highSpeed -= 0.2;
+    if (highSpeed < 1)
+    {
+      highSpeed = 1;
+    }
 
     // 当たった障害物を削除
     obstacles.remove(i);
@@ -94,12 +109,19 @@ for (int i = obstacles.size()-1; i >= 0; i--) {
       // コイン更新
       for (int i = coins.size()-1; i >= 0; i--) {
         Coin c = coins.get(i);
-        c.update();
+        c.update(highSpeed);
         c.display();
       
         // 衝突判定
       if (player.collect(c)) {
   score += c.value;
+  
+  // スピードアップ
+  highSpeed += 0.01;
+  if (maxHighSpeed < highSpeed)
+  {
+    maxHighSpeed = highSpeed;
+  }
 
   // エフェクトの位置と獲得点数を保存
   effectX = c.x;
@@ -121,9 +143,11 @@ for (int i = obstacles.size()-1; i >= 0; i--) {
 
       
       fill(0);
+textAlign(LEFT);
 textSize(24);
 text("HP : " + player.hp, 20, 40);
-text("Score : " + score, 20, 70);
+text("SPEED : " + ((int)(highSpeed*100)-90) + "km/h", 20, 70);
+text("Score : " + score, 20, 100);
 
 drawCoinEffect();
 
@@ -142,9 +166,10 @@ drawCoinEffect();
       fill(0);
       textAlign(CENTER);
       textSize(48);
-      text("GAME OVER", width/2, height/2);
-
+      text("GAME OVER", width/2, height/2 - 100);
+      
       textSize(24);
+      text("SCORE:" + score + "  MAX SPEED:" + ((int)(maxHighSpeed*100)-90) + "km/h", width/2, height/2);
       text("Press R to Restart", width/2, height/2 + 100);
 
       textAlign(LEFT);
@@ -155,7 +180,7 @@ drawCoinEffect();
     isGameOver = true;
   }
 
- void drawRoad() {
+ void drawRoad(float highSpeed) {
   background(120, 190, 100);
 
   noStroke();
@@ -170,7 +195,7 @@ drawCoinEffect();
   );
 
   // 道路脇の木を動かす
-  treeOffset += 10;
+  treeOffset += 10 * highSpeed;
 
   if (treeOffset > 130) {
     treeOffset = 0;
@@ -207,13 +232,13 @@ drawCoinEffect();
   }
 
   // 中央線を動かす
-  roadLineOffset += 12;
+  roadLineOffset += 12 * highSpeed;
 
   if (roadLineOffset > 120) {
     roadLineOffset = 0;
   }
 
-  fill(255, 240, 120);
+  fill(120, 120, 120);
   rectMode(CENTER);
 
   for (float y = -120 + roadLineOffset;
@@ -317,10 +342,10 @@ void drawTitleScreen() {
   text("← → キー：左右移動",
        width / 2, 380);
 
-  text("コインを取るとスコアアップ",
+  text("コインを取るとスコアアップ・スピードアップ",
        width / 2, 420);
 
-  text("障害物に当たるとHPが減る",
+  text("敵に当たるとHPが減り、スピードダウンする",
        width / 2, 460);
 
   if ((frameCount / 30) % 2 == 0) {

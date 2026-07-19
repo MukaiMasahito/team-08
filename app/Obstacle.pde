@@ -10,23 +10,23 @@ abstract class Obstacle {
   float laneOffset;
 
   Obstacle() {
-    y = 50;
+    y = -30;
     speed = 2;
-    size = 15;
+    size = 20;
 
     // 道の奥側でランダムに出現
     laneOffset = random(-45, 45);
     x = width / 2 + laneOffset;
   }
 
-  void update() {
-    y += speed;
+  void update(float highSpeed) {
+    y += speed * highSpeed;
 
     // 手前に来るほど速くする
-    speed += 0.03;
+    speed += 0.03 * highSpeed;
 
     // 手前に来るほど大きくする
-    size += 0.5;
+    size += 0.5 * highSpeed;
 
     // 手前に来るほど左右に広がる
     float spread = map(y, 50, height, 1, 5);

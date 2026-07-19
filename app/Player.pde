@@ -4,9 +4,18 @@ class Player {
   float y;
   float speed = 7;
   float r = 25;
-  float hp;
+  int hp;
   boolean movingLeft = false;
   boolean movingRight = false;
+  
+  
+  float shockRadius = 0;
+  boolean shockActive = false;
+
+  int damageValue = 0;
+  float damageTextY;
+  int damageTimer = 0;
+  
 
   Player() {
     x = width/2;
@@ -14,13 +23,13 @@ class Player {
     hp = 100;
   }
 
-void update() {
+void update(float highSpeed) {
   if (movingLeft) {
-    x -= speed;
+    x -= speed * (highSpeed);
   }
 
   if (movingRight) {
-    x += speed;
+    x += speed * highSpeed;
   }
 
   // プレイヤーの高さに合わせた道の左右端
@@ -30,11 +39,40 @@ void update() {
   float roadRight = width / 2 + roadHalfWidth;
 
   x = constrain(x, roadLeft + r, roadRight - r);
+  
+  // 衝撃波
+  if (shockActive) {
+    shockRadius += 18;
+    if (shockRadius > 180) {
+      shockActive = false;
+    }
+  }
+  // ダメージ文字
+  if (damageTimer > 0) {
+    damageTimer--;
+    damageTextY -= 1.2;
+  }
 }
 
   void display() {
+    // プレイヤー
     fill(50, 100, 255);
     ellipse(x, y, r*2, r*2);
+    // 衝撃波
+    if (shockActive) {
+      noFill();
+      stroke(255,0,0,map(shockRadius,r*2,180,255,0));
+      strokeWeight(5);
+      ellipse(x,y,shockRadius,shockRadius);
+      noStroke();
+    }
+    // ダメージ文字
+    if (damageTimer > 0) {
+      fill(255,0,0);
+      textAlign(CENTER);
+      textSize(28);
+      text("-" + damageValue, x, damageTextY);
+    }
   }
 
   boolean hit(Obstacle o) {
@@ -53,11 +91,22 @@ void update() {
   void Damage(int damage)
   {
     hp -= damage;
+    DamageEffect(damage);
+    if (hp < 0) {
+      hp = 0;
+    }
+  }
+  
+  void DamageEffect(int damage)
+  {
+    shockRadius = r * 2;
+    shockActive = true;
 
-  if (hp < 0) {
-    hp = 0;
+    damageValue = damage;
+    damageTextY = y - 40;
+    damageTimer = 40;
   }
-  }
+  
   void pressKey(int code) {
   if (code == LEFT) {
     movingLeft = true;

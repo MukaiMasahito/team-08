@@ -15,7 +15,7 @@ class Coin {
 
   void reset() {
     size = 20;
-    y = 50;
+    y = 0;
 
     // 10％の確率で高得点コイン
     isRare = random(100) < 10;
@@ -33,15 +33,15 @@ class Coin {
     x = width / 2 + laneOffset;
   }
 
-  void update() {
-    y += speed;
+  void update(float highSpeed) {
+    y += speed * highSpeed;
 
     if (isRare) {
-      speed += 0.05;
-      size += 0.25;
+      speed += 0.05 * highSpeed;
+      size += 0.25 * highSpeed;
     } else {
-      speed += 0.02;
-      size += 0.15;
+      speed += 0.02 * highSpeed;
+      size += 0.15 * highSpeed;
     }
 
     float spread = map(y, 50, height, 1, 5);

@@ -1,10 +1,9 @@
 class Snake extends Obstacle {
   PImage img; // 画像を保存する変数
 
-  Snake() {
-    damage = 30;
-    // dataフォルダ内の画像を読み込みます（ファイル名は保存名に合わせてください）
-    img = loadImage("snake.png"); 
+  Snake(PImage snakeImg) {
+    damage = 20;
+    img = snakeImg;
   }
   
   void display() {
