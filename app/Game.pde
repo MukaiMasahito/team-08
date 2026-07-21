@@ -22,6 +22,11 @@ class Game {
   float effectX;
   float effectY;
   int effectValue;
+  
+  int damageEffectTimer = 0;
+  float damageX;
+  float damageY;
+  int damageValue;
 
   Game() {
     initGame();
@@ -36,7 +41,16 @@ class Game {
   highSpeed = 1;
   maxHighSpeed = 1;
   spawnTimer = 0;
+  
   coinEffectTimer = 0;
+  effectValue = 0;
+  
+   // ダメージ表示をリセット
+  damageEffectTimer = 0;
+  damageValue = 0;
+  damageX = 0;
+  damageY = 0;
+
 
   isGameOver = false;
   isClear = false;
@@ -77,25 +91,27 @@ class Game {
       // 障害物更新
 for (int i = obstacles.size()-1; i >= 0; i--) {
   Obstacle o = obstacles.get(i);
-
-  o.update(highSpeed);
-  o.display();
-
   // 衝突判定
   if (player.hit(o)) {
+
     player.Damage(o.damage);
-    
-    //スピードダウン
+
+    // ダメージエフェクト
+    damageX = player.x;
+    damageY = player.y;
+    damageValue = o.damage;
+    damageEffectTimer = 30;
+
+    // スピードダウン
     highSpeed -= 0.2;
-    if (highSpeed < 1)
-    {
+
+    if (highSpeed < 1) {
       highSpeed = 1;
     }
 
     // 当たった障害物を削除
     obstacles.remove(i);
 
-    // HPが0になったらゲームオーバー
     if (player.hp <= 0) {
       gameOver();
     }
@@ -103,12 +119,18 @@ for (int i = obstacles.size()-1; i >= 0; i--) {
     continue;
   }
 
+  o.update(highSpeed);
+  o.display();
+
+  // 衝突判定
+  
+
   // 画面外に出たら削除
   if (o.y > height + 50) {
     obstacles.remove(i);
   }
 }
-
+  
       // コイン更新
       for (int i = coins.size()-1; i >= 0; i--) {
         Coin c = coins.get(i);
@@ -158,7 +180,7 @@ text("SPEED : " + ((int)(highSpeed*100)-90) + "km/h", 20, 70);
 text("Score : " + score, 20, 100);
 
 drawCoinEffect();
-
+drawDamageEffect();
       } else if (isClear) {
 
   drawClearScreen();
@@ -412,5 +434,30 @@ void drawTitleScreen() {
        height / 2 + 120);
 
   textAlign(LEFT);
+}
+void drawDamageEffect() {
+
+  if (damageEffectTimer > 0) {
+
+    noFill();
+    stroke(255, 0, 0);
+    strokeWeight(5);
+
+    float r = map(damageEffectTimer, 30, 0, 20, 90);
+    ellipse(damageX, damageY, r, r);
+
+    fill(255, 50, 50);
+    textAlign(CENTER);
+    textSize(28);
+
+    text("-" + damageValue + " HP", damageX, damageY - 15);
+
+    damageY -= 2;
+
+    damageEffectTimer--;
+
+    textAlign(LEFT);
+    noStroke();
+  }
 }
 }

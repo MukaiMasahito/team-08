@@ -16,6 +16,7 @@ class Player {
   float damageTextY;
   int damageTimer = 0;
   
+  int damageFlashTimer = 0;
 
   Player() {
     x = width/2;
@@ -54,26 +55,11 @@ void update(float highSpeed) {
   }
 }
 
-  void display() {
-    // プレイヤー
-    fill(50, 100, 255);
-    ellipse(x, y, r*2, r*2);
-    // 衝撃波
-    if (shockActive) {
-      noFill();
-      stroke(255,0,0,map(shockRadius,r*2,180,255,0));
-      strokeWeight(5);
-      ellipse(x,y,shockRadius,shockRadius);
-      noStroke();
-    }
-    // ダメージ文字
-    if (damageTimer > 0) {
-      fill(255,0,0);
-      textAlign(CENTER);
-      textSize(28);
-      text("-" + damageValue, x, damageTextY);
-    }
-  }
+void display() {
+  fill(0, 0, 255);
+  noStroke();
+  ellipse(x, y, r * 2, r * 2);
+}
 
   boolean hit(Obstacle o) {
 
@@ -88,14 +74,16 @@ void update(float highSpeed) {
     return d < r + c.size/2;
   }
   
-  void Damage(int damage)
-  {
-    hp -= damage;
-    DamageEffect(damage);
-    if (hp < 0) {
-      hp = 0;
-    }
+ void Damage(int damage) {
+  hp -= damage;
+
+  if (hp < 0) {
+    hp = 0;
   }
+
+  // 当たった直後に赤く光らせる
+  damageFlashTimer = 15;
+}
   
   void DamageEffect(int damage)
   {
