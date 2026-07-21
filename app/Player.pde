@@ -1,5 +1,6 @@
 class Player {
 
+  PImage playerImage;
   float x;
   float y;
   float speed = 7;
@@ -19,11 +20,13 @@ class Player {
   int damageFlashTimer = 0;
 
   Player() {
-    x = width/2;
-    y = height - 200;
-    hp = 100;
-  }
+  x = width / 2;
+  y = height - 100;
+  r = 20;
+  hp = 100;
 
+  playerImage = loadImage("people.png");
+}
 void update(float highSpeed) {
   if (movingLeft) {
     x -= speed * (highSpeed);
@@ -55,10 +58,20 @@ void update(float highSpeed) {
   }
 }
 
-void display() {
-  fill(0, 0, 255);
-  noStroke();
-  ellipse(x, y, r * 2, r * 2);
+ void display() {
+
+  imageMode(CENTER);
+
+  if (damageFlashTimer > 0) {
+    tint(255, 80, 80);   // 赤く表示
+    damageFlashTimer--;
+  } else {
+    noTint();
+  }
+
+  image(playerImage, x, y, 120, 140);
+
+  noTint();
 }
 
   boolean hit(Obstacle o) {
