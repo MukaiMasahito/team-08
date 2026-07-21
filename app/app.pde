@@ -35,9 +35,11 @@ void keyPressed() {
   }
 
   // ゲームオーバー後にRでタイトルへ戻る
-  if (game.isGameOver && (key == 'r' || key == 'R')) {
-    game.initGame();
-  }
+ if ((game.isGameOver || game.isClear)
+    && (key == 'r' || key == 'R')) {
+
+  game.initGame();
+}
 }
 
 void keyReleased() {
