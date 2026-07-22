@@ -11,7 +11,6 @@ class Game {
   float maxHighSpeed;
   boolean isGameOver;
   boolean isStarted;
-  boolean isClear;
 
   int clearScore = 300;
   int spawnTimer = 0;
@@ -53,7 +52,6 @@ class Game {
 
 
   isGameOver = false;
-  isClear = false;
   isStarted = false;
 }
 
@@ -64,7 +62,7 @@ class Game {
     drawTitleScreen();
     return;
   }
-    if (!isGameOver && !isClear) {
+    if (!isGameOver) {
 
       // 障害物生成
       spawnTimer++;
@@ -155,11 +153,6 @@ for (int i = obstacles.size()-1; i >= 0; i--) {
   coinEffectTimer = 30;
 
   coins.remove(i);
-   // 目標スコアに到達したらクリア
-  if (score >= clearScore) {
-    isClear = true;
-    continue;
-  }
   coins.add(new Coin());
 
   continue;
@@ -181,9 +174,6 @@ text("Score : " + score, 20, 100);
 
 drawCoinEffect();
 drawDamageEffect();
-      } else if (isClear) {
-
-  drawClearScreen();
 
 } else {
 
@@ -391,50 +381,7 @@ void drawTitleScreen() {
 
   textAlign(LEFT);
 }
- void drawClearScreen() {
 
-  // 止まった状態のプレイヤーなどを表示
-  player.display();
-
-  for (Obstacle o : obstacles) {
-    o.display();
-  }
-
-  for (Coin c : coins) {
-    c.display();
-  }
-
-  // 半透明の暗い背景
-  fill(0, 160);
-  rectMode(CORNER);
-  rect(0, 0, width, height);
-
-  textAlign(CENTER);
-
-  fill(255, 220, 0);
-  textSize(55);
-  text("GAME CLEAR!", width / 2, height / 2 - 130);
-
-  fill(255);
-  textSize(28);
-  text("SCORE : " + score, width / 2, height / 2 - 40);
-
-  textSize(24);
-  text(
-    "MAX SPEED : " +
-    ((int)(maxHighSpeed * 100) - 90) +
-    "km/h",
-    width / 2,
-    height / 2 + 10
-  );
-
-  textSize(22);
-  text("Rキーでタイトルへ戻る",
-       width / 2,
-       height / 2 + 120);
-
-  textAlign(LEFT);
-}
 void drawDamageEffect() {
 
   if (damageEffectTimer > 0) {
